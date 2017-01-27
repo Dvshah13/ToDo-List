@@ -22,29 +22,23 @@ def add_task():
 
 @app.route('/mark_task', methods=['POST'])
 def mark_task():
-    print request.form;
-    task_id = int(request.form.get('id'))
-    is_task_done = request.form.get('done')
+    print request.args
+    id = request.form.get('id')
+    done = request.form.get('done')
+    result = db.update('task', id = id, done = done )
+    return jsonify(result)
 
-    results = db.update(
-        'task', {
-            'id': task_id,
-            'done': is_task_done
-        }
-    )
-
+@app.route('/mark_off_task')
+def mark_tasks():
+    results = db.query('select * from task where done = True').dictresult()
     return jsonify(results)
 
-@app.route('/remove_task/<task_id>', methods=['POST'])
-def remove_task(task_id):
-    print task_id
-    db.delete(
-        'task',
-            {
-                'id': task_id
-            }
-    );
-    return "Testing"
+@app.route('/remove_completed', methods = ['POST'])
+def remove_complete():
+    print request.args
+    id = request.form.get('id')
+    result = db.delete('task', id = id)
+    return jsonify(result);
 
 if __name__ == '__main__':
     app.run(debug=True)
